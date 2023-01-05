@@ -61,24 +61,35 @@ public class SellerDaoJDBC implements SellerDao {
 			//Comando para uma consulta SQL
 			//Se a consulta retornar com rs valendo 0, significa que não contém objeto.
 			if(rs.next()) {
+				//Codigo para instanciar um departamento:
 				//Se a minha consulta não tiver nenhum registro, esse rs.next vai dar falso
 				//e vai pularo if //Se der verdadeiro, vai retornar os dados do vendedor(Seller)
-				Department dep = new Department();
-				dep.setId(rs.getInt("DepartmentId"));//ao invés de passar o id, eu passo o nome da 
+				//Department dep = new Department();
+				//dep.setId(rs.getInt("DepartmentId"));//ao invés de passar o id, eu passo o nome da 
 				//coluna que eu quero pegar o Id. Lembrando que vai retornar um int
-				dep.setName(rs.getString("DepName"));
+				//dep.setName(rs.getString("DepName"));
 				//Com isso, eu instanciei um departamento e settei o nome dele
 				
+				//agr vou transformar esse código em função:
+				Department dep = instantiateDepartment(rs);
+				
+				
+				//Codigo para instanciar um vendedor:
 				//Agr eu vou fazer isso com o seller
-				Seller obj = new Seller();
+				/*Seller obj = new Seller();
 				obj.setId(rs.getInt("Id"));
 				obj.setName(rs.getString("Name"));
 				obj.setEmail(rs.getString("Email"));
 				obj.setBaseSalary(rs.getDouble("BaseSalary"));
 				obj.setBirthDate(rs.getDate("BirthDate"));
 				//Nesse caso do setDepartment, vou passar o objeto inteiro, não o id. No caso, 
-				//meu objeto departament é o dep, que eu instanciei ali em cima
-				obj.setDepartment(dep);
+				//meu objeto departament é o dep, que eu instanciei ali em cima 
+				 obj.setDepartment(dep);
+				 */
+				
+				//Vou transformar esse código em função:
+				Seller obj = instantiateSeller(rs, dep);
+				
 				
 				return obj;
 				
@@ -100,6 +111,27 @@ public class SellerDaoJDBC implements SellerDao {
 			//para inserir um novo dado.
 		}
 		
+	}
+	
+	//vou apenas propagar essa exceção.
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
+		Seller obj = new Seller();
+		obj.setId(rs.getInt("Id"));
+		obj.setName(rs.getString("Name"));
+		obj.setEmail(rs.getString("Email"));
+		obj.setBaseSalary(rs.getDouble("BaseSalary"));
+		obj.setBirthDate(rs.getDate("BirthDate"));
+		obj.setDepartment(dep);
+		return obj;
+	}
+
+	//Pode dar uma exceção, mas nesse caso, eu vou apenas propaga-la porque eu já estou tratando
+	//ela em outro metódo
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		Department dep = new Department();
+		dep.setId(rs.getInt("DepartmentId"));
+		dep.setName(rs.getString("DepName"));
+		return dep;
 	}
 
 	@Override

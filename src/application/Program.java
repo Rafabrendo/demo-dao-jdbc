@@ -17,6 +17,7 @@ public class Program {
 		//a implementação, ele conhece somente a interface. Essa tbm é uma forma de fazer a injeção de dependencia
 		//sem explicitar a implementação.
 		
+		System.out.println("=== TEST 1: seller findById ===");
 		Seller seller = sellerDao.findById(3);
 		
 		System.out.println(seller);
