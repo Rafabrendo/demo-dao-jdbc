@@ -2,7 +2,6 @@ package model.entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 public class Seller implements Serializable{
 	
@@ -78,7 +77,7 @@ public class Seller implements Serializable{
 	}
 	
 	//vou comparar só com o id
-	@Override
+	/*@Override
 	public int hashCode() {
 		return Objects.hash(id);
 	}
@@ -93,6 +92,33 @@ public class Seller implements Serializable{
 			return false;
 		Seller other = (Seller) obj;
 		return Objects.equals(id, other.id);
+	}
+*/
+	
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Seller other = (Seller) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 	@Override

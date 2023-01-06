@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -48,7 +51,7 @@ public class SellerDaoJDBC implements SellerDao {
 		//posição 0(zero) não contém objeto, é só a partir da posição 1
 		try {
 			st = conn.prepareStatement(
-					"SELECT seller.*, department.Name as DepName "
+					"SELECT seller.*,department.Name as DepName "
 					+ "FROM seller INNER JOIN department "
 					+ "ON seller.DepartmentId = department.Id "
 					+ "WHERE seller.Id = ?");
@@ -139,6 +142,98 @@ public class SellerDaoJDBC implements SellerDao {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public List<Seller> findByDepartment(Department department) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id "
+					+ "WHERE DepartmentId = ? "
+					+ "ORDER BY Name");
+			
+			st.setInt(1, department.getId());
+			
+			rs = st.executeQuery();
+			
+			List<Seller> list = new ArrayList<>();
+			Map<Integer, Department> map = new HashMap<>();
+			
+			while (rs.next()) {
+				
+				Department dep = map.get(rs.getInt("DepartmentId"));
+				
+				if (dep == null) {
+					dep = instantiateDepartment(rs);
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+				
+				Seller obj = instantiateSeller(rs, dep);
+				list.add(obj);
+			}
+			return list;
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+	}
 	
 
 }
+
+/*try {
+			st = conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id "
+					+ "WHERE DepartmentId = ?"
+					+ "ORDER BY Name");
+			
+			//Como é um Id de Department, o valor do interrogação vai ser um id do department
+			
+			st.setInt(1, department.getId());
+			rs = st.executeQuery();
+			
+			//Como na assinatura do metodo retorna uma lista, eu tenho varios valores, então
+			//eu tenho que criar uma lista de resultados
+			
+			List<Seller> list = new ArrayList<>();
+			//vou fazer um controle para não repetir o departamento utilizando o map
+			Map<Integer, Department> map = new HashMap<>(); //Criei uma estrutura map vazia
+			//vou guardar dentro do map qualquer departamento que eu estanciar.
+			
+			while (rs.next()) {
+				//vou testar com o while se o departamento com determinado id está dentro do map
+				//se não existir, esse map vai retornar null pra cá, se for null, aí sim eu vou instanciar 
+				//o departamento
+				Department dep = map.get(rs.getInt("DepartmentId"));
+				
+				if(dep == null) {
+					dep = instantiateDepartment(rs);
+					//vou salvar o departamento dentro do map para quando for 'procurar' o interpretador veja
+					//que já existe
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+				
+				//Department dep = instantiateDepartment(rs); //vou tirar essa instanciação porque a instanciação mesmo está 
+				//sendo feita dentro do if
+				
+				Seller obj = instantiateSeller(rs, dep);
+				list.add(obj);
+			}
+			return list;
+		}
+		catch(SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);	
+		}*/
